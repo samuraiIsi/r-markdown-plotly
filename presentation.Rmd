@@ -1,0 +1,82 @@
+---
+title: "Fuel Efficiency and Engine Size in Classic Cars"
+author: "Isi"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  ioslides_presentation:
+    self_contained: true
+    widescreen: true
+---
+
+```{r setup, include=FALSE}
+.libPaths(c("r-lib", .libPaths()))
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE
+)
+
+library(plotly)
+library(dplyr)
+
+cars <- tibble::rownames_to_column(mtcars, var = "model") %>%
+  mutate(
+    transmission = ifelse(am == 1, "Manual", "Automatic"),
+    cylinders = factor(cyl)
+  )
+```
+
+## Why this topic?
+
+The `mtcars` dataset is small, recognizable, and perfect for a short web presentation.
+
+- Fuel efficiency matters for both drivers and manufacturers.
+- Engine size and horsepower often trade off against miles per gallon.
+- An interactive chart makes those tradeoffs easy to explore.
+
+## What the data includes
+
+This presentation uses 32 car models from the built-in `mtcars` dataset.
+
+- `mpg`: miles per gallon
+- `disp`: engine displacement
+- `hp`: horsepower
+- `wt`: vehicle weight
+- `am`: transmission type
+
+## Interactive Plotly view
+
+Hover over each point to inspect a specific car model.
+
+```{r}
+plot_ly(
+  data = cars,
+  x = ~disp,
+  y = ~mpg,
+  color = ~transmission,
+  colors = c("#1b6ca8", "#d95f02"),
+  size = ~hp,
+  sizes = c(12, 36),
+  text = ~paste(
+    "<b>", model, "</b><br>",
+    "Horsepower: ", hp, "<br>",
+    "Weight: ", wt, " (1000 lbs)<br>",
+    "Cylinders: ", cylinders
+  ),
+  hoverinfo = "text",
+  type = "scatter",
+  mode = "markers"
+) %>%
+  layout(
+    title = "Fuel efficiency falls as engine displacement grows",
+    xaxis = list(title = "Displacement"),
+    yaxis = list(title = "Miles per gallon"),
+    legend = list(title = list(text = "Transmission"))
+  )
+```
+
+## Main takeaway
+
+- Smaller engines tend to deliver better fuel economy.
+- Manual cars often appear among the more efficient models.
+- High-horsepower cars are concentrated in the low-MPG region.
